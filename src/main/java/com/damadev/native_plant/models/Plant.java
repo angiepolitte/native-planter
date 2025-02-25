@@ -1,46 +1,76 @@
 package com.damadev.native_plant.models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+
+import java.util.Map;
+
 @Entity
 public class Plant {
 
-
     @Id
-    @GeneratedValue
-    private int id;
-    private String commonName;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+    private String name;
+    private String slug;
+
+    @ElementCollection
+    @CollectionTable(name = "plant_data", joinColumns = @JoinColumn(name = "plant_id"))
+    @MapKeyColumn(name = "data_key")
+    @Column(name = "data_value")
+    private Map<String, String> data;
+
+    private String description;
     private String scientificName;
-    private String cycle;
-    private String watering;
-    private String hardinessMin;
-    private String hardinessMax;
-    private boolean isEdible;
+    private String imageUrl;
 
-    public Plant() {};
+    public Plant() {}
 
-    public Plant(int id, String commonName, String scientificName, String cycle, String watering, String hardinessMin, String hardinessMax, boolean isEdible) {
-        this.id = id;
-        this.commonName = commonName;
+    public Plant(String name, String slug, Map<String, String> data, String description, String scientificName, String imageUrl) {
+        this.name = name;
+        this.slug = slug;
+        this.data = data;
+        this.description = description;
         this.scientificName = scientificName;
-        this.cycle = cycle;
-        this.watering = watering;
-        this.hardinessMin = hardinessMin;
-        this.hardinessMax = hardinessMax;
-        this.isEdible = isEdible;
+        this.imageUrl = imageUrl;
     }
 
-    public int getId() {
+    // Getters and Setters
+
+
+    public Integer getId() {
         return id;
     }
 
-    public String getCommonName() {
-        return commonName;
+    public String getName() {
+        return name;
     }
 
-    public void setCommonName(String commonName) {
-        this.commonName = commonName;
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getSlug() {
+        return slug;
+    }
+
+    public void setSlug(String slug) {
+        this.slug = slug;
+    }
+
+    public Map<String, String> getData() {
+        return data;
+    }
+
+    public void setData(Map<String, String> data) {
+        this.data = data;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public String getScientificName() {
@@ -51,43 +81,11 @@ public class Plant {
         this.scientificName = scientificName;
     }
 
-    public String getCycle() {
-        return cycle;
+    public String getImageUrl() {
+        return imageUrl;
     }
 
-    public void setCycle(String cycle) {
-        this.cycle = cycle;
-    }
-
-    public String getWatering() {
-        return watering;
-    }
-
-    public void setWatering(String watering) {
-        this.watering = watering;
-    }
-
-    public String getHardinessMin() {
-        return hardinessMin;
-    }
-
-    public void setHardinessMin(String hardinessMin) {
-        this.hardinessMin = hardinessMin;
-    }
-
-    public String getHardinessMax() {
-        return hardinessMax;
-    }
-
-    public void setHardinessMax(String hardinessMax) {
-        this.hardinessMax = hardinessMax;
-    }
-
-    public boolean isEdible() {
-        return isEdible;
-    }
-
-    public void setEdible(boolean edible) {
-        isEdible = edible;
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 }
