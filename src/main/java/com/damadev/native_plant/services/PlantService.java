@@ -31,7 +31,8 @@ public class PlantService {
     }
 
     public List<Plant> getAllPlants() {
-        String url = "https://permapeople.org/api/plants";
+        String url = (config.getApiUrl() + "/plants");
+// these headers are required for accessing the data from permapeople database, needed in postman if testing there
         HttpHeaders headers = new HttpHeaders();
         headers.set("x-permapeople-key-id", config.getApiKeyId());
         headers.set("x-permapeople-key-secret", config.getApiKeySecret());
@@ -52,6 +53,7 @@ public class PlantService {
             Map<String, String> images = (Map<String, String>) plantData.get("images");
             String imageUrl = (images != null) ? images.get("title") : null;
 
+            // the data is stored in an array of key/value pairs
             // Convert "data" array into a Map<String, String>
             List<Map<String, String>> dataList = (List<Map<String, String>>) plantData.get("data");
             Map<String, String> dataMap = new HashMap<>();
