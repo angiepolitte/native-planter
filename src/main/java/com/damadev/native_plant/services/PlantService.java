@@ -30,9 +30,9 @@ public class PlantService {
         this.restTemplate = restTemplate;
     }
 
-    public List<Plant> getAllPlants() {
-        String url = (config.getApiUrl() + "/plants");
-// these headers are required for accessing the data from permapeople database, needed in postman if testing there
+    public void fetchAndSavePlants() {
+        String url = config.getApiUrl() + "/plants";
+
         HttpHeaders headers = new HttpHeaders();
         headers.set("x-permapeople-key-id", config.getApiKeyId());
         headers.set("x-permapeople-key-secret", config.getApiKeySecret());
@@ -46,31 +46,33 @@ public class PlantService {
         for (Map<String, Object> plantData : plantList) {
             String name = (String) plantData.get("name");
             String slug = (String) plantData.get("slug");
-            String description = (String) plantData.get("description");
-            String scientificName = (String) plantData.get("scientific_name");
+            String usdaHardinessZone = (String) plantData.get("usda_hardiness_zone");
+            String lifeCycle = (String) plantData.get("life_cycle");
+            String lightRequirement = (String) plantData.get("light_requirement");
+            String waterRequirement = (String) plantData.get("water_requirement");
+            String soilType = (String) plantData.get("soil_type");
+            String height = (String) plantData.get("height");
+            String width = (String) plantData.get("width");
+            String layer = (String) plantData.get("layer");
+            boolean isEdible = plantData.get("is_edible") != null && (boolean) plantData.get("is_edible");
+            boolean isNativeTo = plantData.get("is_native_to") != null && (boolean) plantData.get("is_native_to");
+            String type = (String) plantData.get("type");
 
-            // Extract Image URL
-            Map<String, String> images = (Map<String, String>) plantData.get("images");
-            String imageUrl = (images != null) ? images.get("title") : null;
+            // Image URL
+            String imageUrl = (plantData.containsKey("images") && plantData.get("images") instanceof Map)
+                    ? ((Map<String, String>) plantData.get("images")).get("title")
+                    : null;
 
-            // the data is stored in an array of key/value pairs
-            // Convert "data" array into a Map<String, String>
-            List<Map<String, String>> dataList = (List<Map<String, String>>) plantData.get("data");
-            Map<String, String> dataMap = new HashMap<>();
-            for (Map<String, String> entry : dataList) {
-                dataMap.put(entry.get("key"), entry.get("value"));
-            }
+            Plant plant = new Plant(null, name, slug, imageUrl, usdaHardinessZone, lifeCycle, lightRequirement, waterRequirement,
+                    soilType, height, width, layer, isEdible, isNativeTo, type);
 
-            Plant plant = new Plant(name, slug, dataMap, description, scientificName, imageUrl);
             plants.add(plant);
         }
 
-        return plants;
+        plantRepository.saveAll(plants); // Save all plants to the database
     }
 
-
-    public void savePlant(Plant plant) {
-        plantRepository.save(plant);
+    public List<Plant> getStoredPlants() {
+        return (List<Plant>) plantRepository.findAll();
     }
-
 }

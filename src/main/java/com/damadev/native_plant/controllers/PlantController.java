@@ -24,28 +24,23 @@ public class PlantController {
     @Autowired
     private PlantService plantService;
 
+    public PlantController(PlantRepository plantRepository, PlantService plantService) {
+        this.plantRepository = plantRepository;
+        this.plantService = plantService;
+    }
+
     @GetMapping
     public String displayAllPlants(Model model) {
         model.addAttribute("title", "All Plants");
-        model.addAttribute("plants", plantService.getAllPlants()); // Load API data
+        model.addAttribute("plants", plantService.getStoredPlants()); // Load from repository
         return "plant-list";
     }
 
-    @PostMapping("/save")
-    public String savePlant(@RequestParam String name, @RequestParam String slug,
-                            @RequestParam String description, @RequestParam String scientificName,
-                            @RequestParam String imageUrl, @RequestParam Map<String, String> data) {
-
-        // Remove form-specific fields from the data map
-        data.remove("name");
-        data.remove("slug");
-        data.remove("description");
-        data.remove("scientificName");
-        data.remove("imageUrl");
-
-        Plant plant = new Plant(name, slug, data, description, scientificName, imageUrl);
-        plantRepository.save(plant);
-        return "redirect:/plants"; // Reload page
+    // Add a new method to handle fetching and saving plants
+    @PostMapping("/fetch-save")
+    public String fetchAndSavePlants() {
+        plantService.fetchAndSavePlants(); // Fetch and save plant data
+        return "redirect:/plants"; // Redirect to the list of plants after saving
     }
 
 }
