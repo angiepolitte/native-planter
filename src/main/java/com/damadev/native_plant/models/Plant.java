@@ -1,68 +1,64 @@
 package com.damadev.native_plant.models;
 
 import jakarta.persistence.*;
-
-import java.util.Map;
+import jakarta.validation.constraints.Size;
 
 @Entity
 public class Plant {
 
     @Id
     @GeneratedValue
-//    (strategy = GenerationType.IDENTITY)
-    //    fields in the json
     private Integer id;
-    private String name;
-    private String slug;
-    private String description;
-    private String scientificName;
-    private String imageUrl;
-//    the following is stored as a dataset in the json
-//    for the key/value pair in the dataset, @ElementCollection tells Hibernate that data is a collection of values (not a separate entity)
-    @ElementCollection
-//    it creates a new table in MySql called plant_data and uses a Foreign key plant_id to connect them
-    @CollectionTable(name = "plant_data", joinColumns = @JoinColumn(name = "plant_id"))
-//    makes sure the key data is stored under data_key in MySql
-    @MapKeyColumn(name = "data_key")
-    //    makes sure the value data is stored under data_value in MySql
-    @Column(name = "data_value")
-    private Map<String, String> data;
 
-    //Constructors
+
+    private String commonName;
+    private String slug;
+    private String imageUrl;
+    private String usdaHardinessZone;
+    private String lifeCycle;
+    private String lightRequirement;
+    private String waterRequirement;
+    private String soilType;
+    private String height;
+    private String width;
+    private String layer;
+    @Size(max = 1000)
+    private String nativeTo;
+    private boolean isEdible;
+
+
+    private String type;
 
     public Plant() {}
 
-    public Plant(String name, String slug, Map<String, String> data, String description, String scientificName, String imageUrl) {
-        this.name = name;
-        this.slug = slug;
-        this.data = data;
-        this.description = description;
-        this.scientificName = scientificName;
-        this.imageUrl = imageUrl;
-    }
-
-    public Plant(Integer id, String name, String slug, String description, String scientificName, String imageUrl, Map<String, String> data) {
+    public Plant(Integer id, String commonName, String slug, String imageUrl, String usdaHardinessZone, String lifeCycle, String lightRequirement, String waterRequirement, String soilType, String height, String width, String layer, String nativeTo, boolean isEdible, String type) {
         this.id = id;
-        this.name = name;
+        this.commonName = commonName;
         this.slug = slug;
-        this.description = description;
-        this.scientificName = scientificName;
         this.imageUrl = imageUrl;
-        this.data = data;
+        this.usdaHardinessZone = usdaHardinessZone;
+        this.lifeCycle = lifeCycle;
+        this.lightRequirement = lightRequirement;
+        this.waterRequirement = waterRequirement;
+        this.soilType = soilType;
+        this.height = height;
+        this.width = width;
+        this.layer = layer;
+        this.nativeTo = nativeTo;
+        this.isEdible = isEdible;
+        this.type = type;
     }
-    // Getters and Setters
-
 
     public Integer getId() {
         return id;
     }
 
-    public String getName() {
-        return name;
+    public String getCommonName() {
+        return commonName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setCommonName(String commonName) {
+        this.commonName = commonName;
     }
 
     public String getSlug() {
@@ -73,30 +69,6 @@ public class Plant {
         this.slug = slug;
     }
 
-    public Map<String, String> getData() {
-        return data;
-    }
-
-    public void setData(Map<String, String> data) {
-        this.data = data;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getScientificName() {
-        return scientificName;
-    }
-
-    public void setScientificName(String scientificName) {
-        this.scientificName = scientificName;
-    }
-
     public String getImageUrl() {
         return imageUrl;
     }
@@ -104,4 +76,256 @@ public class Plant {
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
     }
+
+    public String getUsdaHardinessZone() {
+        return usdaHardinessZone;
+    }
+
+    public void setUsdaHardinessZone(String usdaHardinessZone) {
+        this.usdaHardinessZone = usdaHardinessZone;
+    }
+
+    public String getLifeCycle() {
+        return lifeCycle;
+    }
+
+    public void setLifeCycle(String lifeCycle) {
+        this.lifeCycle = lifeCycle;
+    }
+
+    public String getLightRequirement() {
+        return lightRequirement;
+    }
+
+    public void setLightRequirement(String lightRequirement) {
+        this.lightRequirement = lightRequirement;
+    }
+
+    public String getWaterRequirement() {
+        return waterRequirement;
+    }
+
+    public void setWaterRequirement(String waterRequirement) {
+        this.waterRequirement = waterRequirement;
+    }
+
+    public String getSoilType() {
+        return soilType;
+    }
+
+    public void setSoilType(String soilType) {
+        this.soilType = soilType;
+    }
+
+    public String getHeight() {
+        return height;
+    }
+
+    public void setHeight(String height) {
+        this.height = height;
+    }
+
+    public String getWidth() {
+        return width;
+    }
+
+    public void setWidth(String width) {
+        this.width = width;
+    }
+
+    public String getLayer() {
+        return layer;
+    }
+
+    public void setLayer(String layer) {
+        this.layer = layer;
+    }
+
+    public String getNativeTo() {
+        return nativeTo;
+    }
+
+    public void setNativeTo(String nativeTo) {
+        this.nativeTo = nativeTo;
+    }
+
+    public boolean isEdible() {
+        return isEdible;
+    }
+
+    public void setEdible(boolean isEdible) {
+        isEdible = isEdible;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
 }
+//@Entity
+//public class Plant {
+//
+//    @Id
+//    private Integer id;
+//
+//    private String commonName;
+//    private String slug;
+//    private String imageUrl;
+//    private String usdaHardinessZone;
+//    private String lifeCycle;
+//    private String lightRequirement;
+//    private String waterRequirement;
+//    private String soilType;
+//    private String height;
+//    private String width;
+//    private String layer;
+//
+//    private boolean isEdible;
+//    private boolean isNativeTo;
+//
+//    private String type;
+//
+//    public Plant() {}
+//
+//    public Plant(Integer id, String commonName, String slug, String imageUrl,
+//                 String usdaHardinessZone, String lifeCycle, String lightRequirement,
+//                 String waterRequirement, String soilType, String height, String width,
+//                 String layer, boolean isEdible, boolean isNativeTo, String type) {
+//        this.id = id;
+//        this.commonName = commonName;
+//        this.slug = slug;
+//        this.imageUrl = imageUrl;
+//        this.usdaHardinessZone = usdaHardinessZone;
+//        this.lifeCycle = lifeCycle;
+//        this.lightRequirement = lightRequirement;
+//        this.waterRequirement = waterRequirement;
+//        this.soilType = soilType;
+//        this.height = height;
+//        this.width = width;
+//        this.layer = layer;
+//        this.isEdible = isEdible;
+//        this.isNativeTo = isNativeTo;
+//        this.type = type;
+//    }
+//
+//    // Getters and Setters (Omitted for brevity)
+//
+//    public Integer getId() {
+//        return id;
+//    }
+//
+//    public String getCommonName() {
+//        return commonName;
+//    }
+//
+//    public void setCommonName(String commonName) {
+//        this.commonName = commonName;
+//    }
+//
+//    public String getSlug() {
+//        return slug;
+//    }
+//
+//    public void setSlug(String slug) {
+//        this.slug = slug;
+//    }
+//
+//    public String getImageUrl() {
+//        return imageUrl;
+//    }
+//
+//    public void setImageUrl(String imageUrl) {
+//        this.imageUrl = imageUrl;
+//    }
+//
+//    public String getUsdaHardinessZone() {
+//        return usdaHardinessZone;
+//    }
+//
+//    public void setUsdaHardinessZone(String usdaHardinessZone) {
+//        this.usdaHardinessZone = usdaHardinessZone;
+//    }
+//
+//    public String getLifeCycle() {
+//        return lifeCycle;
+//    }
+//
+//    public void setLifeCycle(String lifeCycle) {
+//        this.lifeCycle = lifeCycle;
+//    }
+//
+//    public String getLightRequirement() {
+//        return lightRequirement;
+//    }
+//
+//    public void setLightRequirement(String lightRequirement) {
+//        this.lightRequirement = lightRequirement;
+//    }
+//
+//    public String getWaterRequirement() {
+//        return waterRequirement;
+//    }
+//
+//    public void setWaterRequirement(String waterRequirement) {
+//        this.waterRequirement = waterRequirement;
+//    }
+//
+//    public String getSoilType() {
+//        return soilType;
+//    }
+//
+//    public void setSoilType(String soilType) {
+//        this.soilType = soilType;
+//    }
+//
+//    public String getHeight() {
+//        return height;
+//    }
+//
+//    public void setHeight(String height) {
+//        this.height = height;
+//    }
+//
+//    public String getWidth() {
+//        return width;
+//    }
+//
+//    public void setWidth(String width) {
+//        this.width = width;
+//    }
+//
+//    public String getLayer() {
+//        return layer;
+//    }
+//
+//    public void setLayer(String layer) {
+//        this.layer = layer;
+//    }
+//
+//    public boolean isEdible() {
+//        return isEdible;
+//    }
+//
+//    public void setEdible(boolean edible) {
+//        isEdible = edible;
+//    }
+//
+//    public boolean isNativeTo() {
+//        return isNativeTo;
+//    }
+//
+//    public void setNativeTo(boolean nativeTo) {
+//        isNativeTo = nativeTo;
+//    }
+//
+//    public String getType() {
+//        return type;
+//    }
+//
+//    public void setType(String type) {
+//        this.type = type;
+//    }
+//}
