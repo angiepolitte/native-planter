@@ -37,12 +37,18 @@ public class PlantService {
 
     // Cleaned-up version to fetch a limited number of plants
     @Transactional
-    public void fetchAndStorePlants(int limit) {
-        String apiUrl = config.getApiUrl() + "/plants";
+    public void fetchAndStorePlants(int limit, Integer lastId) {
+        // Construct the API URL with pagination (last_id for pagination)
+        String apiUrl = config.getApiUrl() + "/plants?limit=" + limit;
+        if (lastId != null) {
+            apiUrl += "&last_id=" + lastId;
+        }
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("x-permapeople-key-id", config.getApiKeyId());
         headers.set("x-permapeople-key-secret", config.getApiKeySecret());
+
+        // Fetch plants using the RestTemplate
         ResponseEntity<PlantResponseDTO> response = restTemplate.exchange(
                 apiUrl,
                 HttpMethod.GET,
@@ -61,7 +67,6 @@ public class PlantService {
             plant.setSlug(plantData.getSlug());
             plant.setType(plantData.getType() != null ? plantData.getType() : "Unknown");
 
-
             // Extract specific values from 'data' array
             plant.setUsdaHardinessZone(extractAttributeValue(plantData.getData(), "USDA Hardiness zone"));
             plant.setLifeCycle(extractAttributeValue(plantData.getData(), "Life cycle"));
@@ -74,13 +79,25 @@ public class PlantService {
             plant.setType(extractAttributeValue(plantData.getData(), "Type"));
 
             // Set image URL
-//            plant.setImageUrl(plantData.getImages() != null ? plantData.getImages().getTitle() : "default_image_url");
             plant.setImageUrl(plantData.getImages() != null ? plantData.getImages().get("title") : "default_image_url");
 
             // Set 'nativeTo'
-            plant.setNativeTo(extractAttributeValue(plantData.getData(), "Native to"));
-            // Set 'isEdible' by extracting the boolean value (if exists)
-            plant.setEdible(extractBooleanAttributeValue(plantData.getData(), "Edible"));
+//            plant.setNativeTo(extractAttributeValue(plantData.getData(), "Native to"));
+            // Set 'nativeTo' with a size limit check
+            String nativeTo = extractAttributeValue(plantData.getData(), "Native to");
+            if (nativeTo != null && nativeTo.length() > 1000) {
+                nativeTo = nativeTo.substring(0, 1000);  // Trimming to 1000 characters
+            }
+            plant.setNativeTo(nativeTo);
+
+            // Set 'isEdible' based on the 'Edible parts' or 'Edible uses'
+            String edibleParts = extractAttributeValue(plantData.getData(), "Edible parts");
+            String edibleUses = extractAttributeValue(plantData.getData(), "Edible uses");
+            if (edibleParts != null || edibleUses != null) {
+                plant.setEdible(true);
+            } else {
+                plant.setEdible(false);
+            }
 
             // Store the plant
             plantRepository.save(plant);
@@ -112,85 +129,103 @@ public class PlantService {
     }
 }
 
-//        HttpEntity<String> entity = new HttpEntity<>(headers);
-//        ResponseEntity<PlantResponseDTO> response = restTemplate.exchange(url, HttpMethod.GET, entity, PlantResponseDTO.class);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 //
-//        List<PlantResponseDTO.PlantData> plantList = response.getBody().getPlants();
-//        int count = 0;
+//@Transactional
+//public void fetchAndStorePlants(int limit) {
+//    String apiUrl = config.getApiUrl() + "/plants";
 //
-//        for (PlantResponseDTO.PlantData plantData : plantList) {
-//            if (count >= limit) break;  // Stop after fetching the specified limit
-//            count++;
+//    HttpHeaders headers = new HttpHeaders();
+//    headers.set("x-permapeople-key-id", config.getApiKeyId());
+//    headers.set("x-permapeople-key-secret", config.getApiKeySecret());
+//    ResponseEntity<PlantResponseDTO> response = restTemplate.exchange(
+//            apiUrl,
+//            HttpMethod.GET,
+//            new HttpEntity<>(headers),
+//            PlantResponseDTO.class
+//    );
 //
-//            System.out.println("Fetched Plant: " + plantData.getName() + ", " + plantData.getSlug() + ", " + plantData.getImageUrl());
+//    System.out.println("API Response: " + response.getBody());
 //
-//            // Map the plant data to the Plant model
-//            Plant plant = new Plant(
-//                    null,
-//                    plantData.getName(),
-//                    plantData.getSlug(),
-//                    plantData.getImageUrl(),  // No need for the manual extraction of the image URL
-//                    plantData.getUsdaHardinessZone(),
-//                    plantData.getLifeCycle(),
-//                    plantData.getLightRequirement(),
-//                    plantData.getWaterRequirement(),
-//                    plantData.getSoilType(),
-//                    plantData.getHeight(),
-//                    plantData.getWidth(),
-//                    plantData.getLayer(),
-//                    plantData.getNativeTo(),  // NativeTo from the attributes
-//                    plantData.isEdible(),  // Edible from the attributes
-//                    plantData.getType()  // Type from the attributes
-//            );
+//    List<PlantResponseDTO.PlantData> plantDataList = response.getBody().getPlants();
 //
-//            plantRepository.save(plant);
+//    for (PlantResponseDTO.PlantData plantData : plantDataList) {
+//        // Create new Plant entity
+//        Plant plant = new Plant();
+//        plant.setCommonName(plantData.getName());
+//        plant.setSlug(plantData.getSlug());
+//        plant.setType(plantData.getType() != null ? plantData.getType() : "Unknown");
+//
+//
+//        // Extract specific values from 'data' array
+//        plant.setUsdaHardinessZone(extractAttributeValue(plantData.getData(), "USDA Hardiness zone"));
+//        plant.setLifeCycle(extractAttributeValue(plantData.getData(), "Life cycle"));
+//        plant.setLightRequirement(extractAttributeValue(plantData.getData(), "Light requirement"));
+//        plant.setWaterRequirement(extractAttributeValue(plantData.getData(), "Water requirement"));
+//        plant.setSoilType(extractAttributeValue(plantData.getData(), "Soil type"));
+//        plant.setHeight(extractAttributeValue(plantData.getData(), "Height"));
+//        plant.setWidth(extractAttributeValue(plantData.getData(), "Width"));
+//        plant.setLayer(extractAttributeValue(plantData.getData(), "Layer"));
+//        plant.setType(extractAttributeValue(plantData.getData(), "Type"));
+//
+//        // Set image URL
+////            plant.setImageUrl(plantData.getImages() != null ? plantData.getImages().getTitle() : "default_image_url");
+//        plant.setImageUrl(plantData.getImages() != null ? plantData.getImages().get("title") : "default_image_url");
+//
+//        // Set 'nativeTo'
+//        plant.setNativeTo(extractAttributeValue(plantData.getData(), "Native to"));
+//        // Set 'isEdible' by extracting the boolean value (if exists)
+////            plant.setEdible(extractBooleanAttributeValue(plantData.getData(), "Edible"));
+//        String edibleParts = extractAttributeValue(plantData.getData(), "Edible parts");
+//        String edibleUses = extractAttributeValue(plantData.getData(), "Edible uses");
+//        if (edibleParts != null || edibleUses != null) {
+//            plant.setEdible(true);
+//        } else {
+//            plant.setEdible(false);
 //        }
-//    }
-//    public List<Plant> getAllPlants() {
-//        return (List<Plant>) plantRepository.findAll();
+//
+//        // Store the plant
+//        plantRepository.save(plant);
 //    }
 //}
 //
-//    // Helper method to find values in the "data" array
-//    private String findValue(List<PlantResponseDTO.PlantAttribute> data, String key) {
-//        for (PlantResponseDTO.PlantAttribute entry : data) {
-//            if (entry.getKey().equalsIgnoreCase(key)) {
-//                return entry.getValue();
-//            }
-//        }
-//        return null; // Return null if key is not found
-//    }
-//        List<PlantResponseDTO.PlantData> plantList = response.getBody().getPlants();
-//        int count = 0;
-//
-//        for (PlantResponseDTO.PlantData plantData : plantList) {
-//            if (count >= limit) break;  // Stop after fetching the specified limit
-//            count++;
-//
-//            // Map the plant data to the Plant model
-//            Plant plant = new Plant(
-//                    null,
-//                    plantData.getName(),
-//                    plantData.getSlug(),
-//                    plantData.getImageUrl(),
-//                    plantData.getUsdaHardinessZone(),
-//                    plantData.getLifeCycle(),
-//                    plantData.getLightRequirement(),
-//                    plantData.getWaterRequirement(),
-//                    plantData.getSoilType(),
-//                    plantData.getHeight(),
-//                    plantData.getWidth(),
-//                    plantData.getLayer(),
-//                    plantData.getNativeTo(),  // Directly use nativeTo as String
-//                    plantData.isEdible(),  // Use boolean directly
-//                    plantData.getType()
-//            );
-//
-//            plantRepository.save(plant);
-//        }
-//    }
-//
-//    public List<Plant> getAllPlants() {
-//        return (List<Plant>) plantRepository.findAll();
-//    }
+//public List<Plant> getAllPlants() {
+//    Iterable<Plant> plants = plantRepository.findAll();
+//    List<Plant> plantList = new ArrayList<>();
+//    plants.forEach(plantList::add);  // Adds each plant to the list
+//    return plantList;
 //}
+//
+//private String extractAttributeValue(List<PlantResponseDTO.PlantAttribute> attributes, String key) {
+//    if (attributes == null) {
+//        return null;  // Return null if attributes is null
+//    }
+//
+//    return attributes.stream()
+//            .filter(attr -> key.equals(attr.getKey()))
+//            .map(PlantResponseDTO.PlantAttribute::getValue)
+//            .findFirst()
+//            .orElse(null);
+//}
+//
+//private boolean extractBooleanAttributeValue(List<PlantResponseDTO.PlantAttribute> attributes, String key) {
+//    String value = extractAttributeValue(attributes, key);
+//    return value != null && "true".equalsIgnoreCase(value);
+//}
+

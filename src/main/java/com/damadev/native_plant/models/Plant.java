@@ -154,7 +154,7 @@ public class Plant {
     }
 
     public void setEdible(boolean isEdible) {
-        isEdible = isEdible;
+        this.isEdible = isEdible;
     }
 
     public String getType() {

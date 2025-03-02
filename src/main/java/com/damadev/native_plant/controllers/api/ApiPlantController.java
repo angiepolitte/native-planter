@@ -22,22 +22,47 @@ public class ApiPlantController {
     public List<Plant> getAllPlants() {
         return plantService.getAllPlants();
     }
-
     @PostMapping("/fetch")
-    public ResponseEntity<List<Plant>> fetchAndStorePlants(@RequestParam(defaultValue = "5") int limit) {
-        // Fetch and store plants
-        plantService.fetchAndStorePlants(limit);
+    public ResponseEntity<List<Plant>> fetchAndStorePlants(
+            @RequestParam(defaultValue = "100") int limit,  // Default to 500 plants per request
+            @RequestParam(required = false) Integer last_id) {  // Optional last_id for pagination
 
-        // Get the list of plants to return
+        // Fetch and store plants by passing the last_id for pagination
+        plantService.fetchAndStorePlants(limit, last_id);
+
+        // Get the list of all stored plants to return
         List<Plant> plants = plantService.getAllPlants();
 
         // Return the list of fetched plants in the response body
         return ResponseEntity.ok(plants);
     }
 
-//    @PostMapping("/fetch")
-//    public String fetchAndStorePlants(@RequestParam(defaultValue = "5") int limit) {
-//        plantService.fetchAndStorePlants(limit);
-//        return "Fetched " + limit + " plants successfully.";
-//    }
+
 }
+
+
+//    @PostMapping("/fetch")
+//    public ResponseEntity<List<Plant>> fetchAndStorePlants(
+//            @RequestParam(defaultValue = "5") int limit,
+//            @RequestParam(required = false) Integer last_id) {
+//
+//        // Fetch and store plants by passing the last_id for pagination
+//        plantService.fetchAndStorePlants(limit, last_id);
+//
+//        // Get the list of plants to return
+//        List<Plant> plants = plantService.getAllPlants();
+//
+//        // Return the list of fetched plants in the response body
+//        return ResponseEntity.ok(plants);
+//    }
+//    @PostMapping("/fetch")
+//    public ResponseEntity<List<Plant>> fetchAndStorePlants(@RequestParam(defaultValue = "5") int limit) {
+//        // Fetch and store plants
+//        plantService.fetchAndStorePlants(limit);
+//
+//        // Get the list of plants to return
+//        List<Plant> plants = plantService.getAllPlants();
+//
+//        // Return the list of fetched plants in the response body
+//        return ResponseEntity.ok(plants);
+//    }
